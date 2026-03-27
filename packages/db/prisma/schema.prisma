@@ -11,3 +11,29 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+
+model User {
+  id  String @id @default(uuid())
+  name String?
+  email String  @unique
+  password String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  token String? @unique
+  tasks Task[]
+}
+
+model Task {
+  id String @id @default(uuid())
+  title String
+  description String
+  status String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId String 
+  user User @relation(fields: [userId],references: [id])
+
+
+  @@index([userId,status])
+}
