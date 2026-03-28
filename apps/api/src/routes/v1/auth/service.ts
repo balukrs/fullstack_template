@@ -2,16 +2,17 @@ import { prisma } from '../../../lib/prisma'
 import type { Response } from 'express'
 import bcrypt from 'bcrypt'
 import Jwt from 'jsonwebtoken'
+import { CustomError } from '../../../utils/error'
 
 const checkUserExist = async (email: string) => {
   const user = await prisma.user.findUnique({ where: { email } })
   return user
 }
 
-export const createUser = async (email: string, password: string, res: Response) => {
+export const createUser = async (email: string, password: string) => {
   const isUser = await checkUserExist(email)
 
-  if (isUser) return res.status(400).json({ message: 'User Already Available', success: false })
+  if (isUser) throw new CustomError('User Already Available', 400)
 
   const hashed = await bcrypt.hash(password, 10)
 
@@ -21,12 +22,12 @@ export const createUser = async (email: string, password: string, res: Response)
 export const loginUser = async (email: string, password: string, res: Response) => {
   const isUser = await checkUserExist(email)
 
-  if (!isUser) return res.status(404).json({ message: 'User not found', success: false })
+  if (!isUser) throw new CustomError('User not found', 400)
 
-  const compare = await bcrypt.compare(isUser.password, password)
+  const compare = await bcrypt.compare(password, isUser.password)
 
   if (!compare) {
-    return res.status(400).json({ message: 'Invalid Password', success: false })
+    throw new CustomError('Invalid Password', 400)
   }
 
   if (process.env.JWT_SECRET) {
@@ -45,7 +46,8 @@ export const loginUser = async (email: string, password: string, res: Response) 
       maxAge: 60 * 60 * 1000,
       secure: process.env.NODE_ENV === 'production',
     })
-    return res.status(200).json({ message: 'Logged In', success: true })
+
+    return { email: isUser.email, id: isUser.id }
   }
-  return res.status(500).json({ message: 'Secret not available', success: false })
+  throw new CustomError('Internal Server Error', 500)
 }

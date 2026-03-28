@@ -5,6 +5,7 @@ import { prisma } from './lib/prisma'
 
 // Routes
 import v1 from './routes/v1'
+import errorMiddleWare from './middleware/errorMiddleware'
 
 const createServer = (): Express => {
   const app = express()
@@ -32,6 +33,7 @@ const createServer = (): Express => {
   })
 
   app.use('/api/v1', v1)
+  app.use(errorMiddleWare)
 
   return app
 }

@@ -1,14 +1,28 @@
-import type { Request, Response } from 'express'
-import { createUser } from './service'
-import { extractErrorMessage } from '../../../utils/error'
+import type { Request, Response, NextFunction } from 'express'
+import { createUser, loginUser } from './service'
+import type { SignUpResponse, LoginResponse } from '@template/shared'
 
-export const signUp = async (req: Request, res: Response) => {
+export const signUp = async (req: Request, res: Response<SignUpResponse>, next: NextFunction) => {
   try {
     const { email, password } = req.body
-    await createUser(email, password, res)
+    await createUser(email, password)
     return res.status(201).json({ message: 'User Created', success: true })
   } catch (error) {
-    console.error(error)
-    return res.status(500).json({ message: extractErrorMessage(error), success: false })
+    next(error)
+  }
+}
+
+export const login = async (req: Request, res: Response<LoginResponse>, next: NextFunction) => {
+  try {
+    const { email, password } = req.body
+    const user = await loginUser(email, password, res)
+
+    if (user?.email) {
+      return res
+        .status(200)
+        .json({ message: 'Logged In', success: true, data: { email: user.email, id: user.id } })
+    }
+  } catch (error) {
+    next(error)
   }
 }
