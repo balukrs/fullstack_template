@@ -18,7 +18,7 @@ const PrivateRoute = () => {
   }
 
   return (
-    <div>
+    <div className="min-h-screen w-full bg-amber-950">
       <Outlet />
     </div>
   )

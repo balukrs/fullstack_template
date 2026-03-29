@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import validationMiddleware from '../../../middleware/validationMiddleware'
+import { validationMiddleware } from '../../../middleware/validationMiddleware'
 import { signupschema } from './schema'
 
 // Controllers

@@ -1,6 +1,6 @@
 import { prisma } from '../../../lib/prisma'
 import type { Request, Response, NextFunction } from 'express'
-import type { MeResponse, ListTaskRequest } from '@template/shared'
+import type { MeResponse, TaskDeleteRequest } from '@template/shared'
 import { CustomError } from '../../../utils/error'
 
 import { createTask, updateTask, listTask, removeTask } from './services'
@@ -40,7 +40,7 @@ export const postTask = async (req: Request, res: Response, next: NextFunction) 
   }
 }
 
-export const putTask = async (req: Request, res: Response, next: NextFunction) => {
+export const patchTask = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const reqBody = req.body
 
@@ -54,15 +54,11 @@ export const putTask = async (req: Request, res: Response, next: NextFunction) =
   }
 }
 
-export const getTask = async (
-  req: Request<object, object, object, ListTaskRequest>,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getTasks = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const page = req.query.page
-    const limit = req.query.limit
-    const userId = req.query.userId
+    const page = Number(req.query.page)
+    const limit = Number(req.query.limit)
+    const userId = String(req.query.userId)
 
     const data = await listTask({ page, limit, userId })
 
@@ -76,9 +72,9 @@ export const getTask = async (
 
 export const deleteTask = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const reqBody = req.body
+    const params = req.params as TaskDeleteRequest
 
-    const task = await removeTask(reqBody)
+    const task = await removeTask(params)
 
     if (task) {
       return res.status(200).json({ message: 'Task removed', success: true })
