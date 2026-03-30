@@ -9,6 +9,7 @@ export default function App() {
       <Routes>
         <Route element={<PrivateRoute />}>
           <Route index element={<LazyRoutes.dashboard />} />
+          <Route path="view" element={<LazyRoutes.view />} />
         </Route>
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<LazyRoutes.login />} />

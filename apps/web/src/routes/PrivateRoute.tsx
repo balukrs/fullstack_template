@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { getUser } from '@/api/users'
 import { Navigate, Outlet } from 'react-router'
+import Navbar from '@/components/common/Navbar'
 
 const PrivateRoute = () => {
   const { data, isLoading, isError } = useQuery({
@@ -19,7 +20,10 @@ const PrivateRoute = () => {
 
   return (
     <div className="min-h-screen w-full bg-amber-950">
-      <Outlet />
+      <Navbar />
+      <div className="container h-full mx-auto overflow-x-hidden">
+        <Outlet />
+      </div>
     </div>
   )
 }
